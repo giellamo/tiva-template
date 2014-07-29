@@ -71,11 +71,11 @@ $(OUTDIR)/%.o: %.c | $(OUTDIR)
 	@echo "\t[CC]\t\t $@"
 	$(Q)$(CC) -o $@ $^ $(CFLAGS)
 
-$(OUTDIR)/a.out: $(OBJECTS)
+$(OUTDIR)/$(TARGET).elf: $(OBJECTS)
 	@echo "\t[LD]\t\t ELF $@"
 	$(Q)$(LD) -o $@ $^ $(LDFLAGS)
 
-$(OUTDIR)/main.bin: $(OUTDIR)/a.out
+$(OUTDIR)/$(TARGET).bin: $(OUTDIR)/$(TARGET).elf
 	@echo "\t[OBJCOPY]\t $@"
 	$(Q)$(OBJCOPY) -O binary $< $@
 

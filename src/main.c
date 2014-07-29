@@ -34,7 +34,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
-#include "include/pinout.h"
+#include "drivers/pinout.h"
 
 //*****************************************************************************
 //
