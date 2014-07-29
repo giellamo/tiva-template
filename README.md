@@ -1,27 +1,6 @@
 Tiva Template
 ==================
 
-## Toolchain
-
-### Dependencies:
-
-* flex
-* bison
-* libgmp3-dev
-* libmpfr-dev
-* libncurses5-dev
-* libmpc-dev
-* autoconf
-* texinfo
-* libftdi-dev
-* python-yaml
-* zlib1g-dev
-
-To get all dependencies on Ubuntu:
-
-    apt-get install flex bison libgmp3-dev libmpfr-dev libncurses5-dev \
-    libmpc-dev autoconf texinfo build-essential libftdi-dev python-yaml \
-    zlib1g-dev
 
 You will need an ARM bare-metal toolchain to build code for Tiva targets.
 You can get a toolchain from the

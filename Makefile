@@ -1,7 +1,7 @@
 # Tiva Makefile
 # #####################################
 #
-# Part of the uCtools project
+# Inspired by the uCtools project
 # uctools.github.com
 #
 #######################################
