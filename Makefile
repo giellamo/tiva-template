@@ -29,8 +29,8 @@ LD_SCRIPT = $(MCU).ld
 # define flags
 CFLAGS = -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CFLAGS += -ffunction-sections -fdata-sections -MD -std=c99 -Wall
-CFLAGS += -pedantic -DPART_$(MCU) -c -I$(TIVAWARE_PATH) $(INC_PARAMS)	
-CFLAGS += -DTARGET_IS_TM4C129_RA0 -Dgcc
+CFLAGS += -pedantic -DPART_$(MCU) -c -I$(TIVAWARE_PATH) $(INC_PARAMS)
+CFLAGS += -DTARGET_IS_TM4C129_RA0 -Dgcc	 -D_DO_NOT_GENERATE_ACCESSORS_
 LDFLAGS = -T $(LD_SCRIPT) --entry ResetISR --gc-sections -ldriver -L$(TIVAWARE_PATH)/driverlib/gcc
 
 #######################################
@@ -47,12 +47,18 @@ RM      = rm -f
 MKDIR	= mkdir -p
 #######################################
 
-ifdef DEBUG
-$(info DEBUG build)
-CFLAGS+=-g -D DEBUG -O0
-else
+# Taking addresses of the libraries
+LIBGCC:=${shell ${CC} ${CFLAGS} -print-libgcc-file-name}
+LIBC:=${shell ${CC} ${CFLAGS} -print-file-name=libc.a}
+LIBM:=${shell ${CC} ${CFLAGS} -print-file-name=libm.a}
+
+#######################################
+ifdef RELEASE
 $(info RELEASE build)
 CFLAGS+=-Os
+else
+$(info DEBUG build)
+CFLAGS+=-g -D DEBUG -O0
 endif
 
 ifdef VERBOSE
@@ -63,6 +69,8 @@ endif
 
 # list of object files, placed in the build directory regardless of source path
 OBJECTS = $(addprefix $(OUTDIR)/,$(notdir $(SOURCES:.c=.o)))
+ASMS = $(addprefix $(OUTDIR)/,$(notdir $(SOURCES:.c=.s)))
+
 
 # default: build bin
 all: $(OUTDIR)/$(TARGET).bin
@@ -72,8 +80,8 @@ $(OUTDIR)/%.o: %.c | $(OUTDIR)
 	$(Q)$(CC) -o $@ $^ $(CFLAGS)
 
 $(OUTDIR)/$(TARGET).elf: $(OBJECTS)
-	@echo "\t[LD]\t\t ELF $@"
-	$(Q)$(LD) -o $@ $^ $(LDFLAGS)
+	@echo "\t[LD]\t\t $@"
+	$(Q)$(LD) -o $@ $^ $(LDFLAGS)  '${LIBC}'
 
 $(OUTDIR)/$(TARGET).bin: $(OUTDIR)/$(TARGET).elf
 	@echo "\t[OBJCOPY]\t $@"
@@ -83,6 +91,12 @@ $(OUTDIR)/$(TARGET).bin: $(OUTDIR)/$(TARGET).elf
 $(OUTDIR):
 	@echo "\t[MKDIR] $@"
 	$(Q)$(MKDIR) $(OUTDIR)
+
+$(OUTDIR)/%.s: %.c | $(OUTDIR)
+	@echo "\t[AS]\t\t $@"
+	$(Q)$(CC) -c -g -Wa,-ahl=$@ $^ $(CFLAGS)
+
+asm: $(ASMS)
 
 clean:
 	@echo "\t[CLEAN] $@"
