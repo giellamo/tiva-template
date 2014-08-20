@@ -4,6 +4,8 @@ MEMORY
     SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0X00008000
 }
 
+STACK_SIZE   = 1024;
+
 SECTIONS
 {
     /* code */
@@ -34,5 +36,24 @@ SECTIONS
         *(COMMON)
         _ebss = .;
     } > SRAM
+    
+    .guard : {
+    	__guard_start_ =  . ;
+    	
+    	. += 32;
+    	
+    	__guard_end_ =  . ;
+    }
+    
+    .stack : {
+        __stack_start__ = . ;
+        
+        . += STACK_SIZE;
+        . = ALIGN (4);
+        
+        __stack_end__ = .;
+    } >SRAM
+    
+}
 
 }

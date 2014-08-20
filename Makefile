@@ -42,6 +42,8 @@ LDFLAGS = -T $(LD_SCRIPT) --entry ResetISR --gc-sections -ldriver -L$(TIVAWARE_P
 #######################################
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-ld
+NM = arm-none-eabi-nm
+READELF = arm-none-eabi-readelf
 OBJCOPY = arm-none-eabi-objcopy
 RM      = rm -f
 MKDIR	= mkdir -p
@@ -97,6 +99,9 @@ $(OUTDIR)/%.s: %.c | $(OUTDIR)
 	$(Q)$(CC) -c -g -Wa,-ahl=$@ $^ $(CFLAGS)
 
 asm: $(ASMS)
+
+elfinfo: 
+	$(Q)$(READELF) -e  $(OUTDIR)/$(TARGET).elf
 
 clean:
 	@echo "\t[CLEAN] $@"

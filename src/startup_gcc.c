@@ -48,8 +48,9 @@ extern int main(void);
 // Reserve space for the system stack.
 //
 //*****************************************************************************
-static uint32_t pui32Stack[128];
-
+extern uint32_t __guard_start_;
+extern uint32_t __guard_end_;
+extern uint32_t __stack_end__;
 //*****************************************************************************
 //
 // The vector table.  Note that the proper constructs must be placed on this to
@@ -59,7 +60,7 @@ static uint32_t pui32Stack[128];
 __attribute__ ((section(".isr_vector")))
 void (* const g_pfnVectors[])(void) =
 {
-    (void (*)(void))((uint32_t)pui32Stack + sizeof(pui32Stack)),
+   (void (*)(void))((uint32_t)&__stack_end__),
                                             // The initial stack pointer
     ResetISR,                               // The reset handler
     NmiSR,                                  // The NMI handler
@@ -226,6 +227,15 @@ ResetISR(void)
     {
         *pui32Dest++ = *pui32Src++;
     }
+
+    //
+    // an area used to guard the stack
+    //
+    for (uint32_t * stackGuard=&__guard_start_; stackGuard<&__guard_end_;)
+    {
+      *stackGuard++=0xdeadbeef;
+    }
+
 
     //
     // Zero fill the bss segment.
